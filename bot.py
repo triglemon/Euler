@@ -3,8 +3,13 @@ import keyboard
 import speech_recognition as sr
 from discord.ext import commands
 
+with open('token') as token_file:
+    token = token_file.read()
 bot = commands.Bot(command_prefix='~')
 bot.connection = None
+
+channel_id = 544008926132305930
+
 recognizer = sr.Recognizer()
 
 
@@ -14,7 +19,12 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    bot.loop.create_task(file_task())
+    bot.loop.create_task(keyboard_detect())
+
+
+@bot.command(pass_context=True)
+async def yeet(ctx):
+    await ctx.send("Mageet")
 
 
 @bot.command(pass_context=True)
@@ -35,7 +45,7 @@ async def leave(ctx):
         await clients[origin].disconnect()
 
 
-async def open_mic():
+def open_mic():
     with sr.Microphone() as source:
         print("Please wait. Calibrating microphone...")
         recognizer.adjust_for_ambient_noise(source, duration=3)
@@ -43,12 +53,10 @@ async def open_mic():
         audio = recognizer.listen(source)
     try:
         command = recognizer.recognize_sphinx(audio)
-        if command in ["pies", "pods", "pas", "paws"]:
-            command = "pause"
+        print(f"Recognized command: {command}")
         return command
         # with open('log', 'a') as log_file:
         #     log_file.write(command + '\n')
-        pass
     except sr.UnknownValueError:
         print("Sphinx could not understand audio")
         pass
@@ -57,17 +65,14 @@ async def open_mic():
         pass
 
 
-async def keyboard_detect()
-
-async def file_task():
+async def keyboard_detect():
     while True:
-        if os.path.exists('command.txt'):
-            with open('command.txt') as command:
-                command_text = command.read()
-                print(command_text)
-            os.remove('command.txt')
-            channel = bot.get_channel(521540280629854218)
-            await channel.send(command_text)
+        keyboard.wait('up')
+        command = open_mic()
+        if command:
+            if command in ["pies", "pods", "pas", "paws"]:
+                command = "pause"
+            channel = bot.get_channel(channel_id)
+            await channel.send(command)
 
-
-bot.run()
+bot.run(token)
