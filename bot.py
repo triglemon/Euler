@@ -1,8 +1,11 @@
 import os
+import keyboard
+import speech_recognition as sr
 from discord.ext import commands
 
 bot = commands.Bot(command_prefix='~')
 bot.connection = None
+recognizer = sr.Recognizer()
 
 
 @bot.event
@@ -32,6 +35,30 @@ async def leave(ctx):
         await clients[origin].disconnect()
 
 
+async def open_mic():
+    with sr.Microphone() as source:
+        print("Please wait. Calibrating microphone...")
+        recognizer.adjust_for_ambient_noise(source, duration=3)
+        print("Say something!")
+        audio = recognizer.listen(source)
+    try:
+        command = recognizer.recognize_sphinx(audio)
+        if command in ["pies", "pods", "pas", "paws"]:
+            command = "pause"
+        return command
+        # with open('log', 'a') as log_file:
+        #     log_file.write(command + '\n')
+        pass
+    except sr.UnknownValueError:
+        print("Sphinx could not understand audio")
+        pass
+    except sr.RequestError as e:
+        print("Sphinx error; {0}".format(e))
+        pass
+
+
+async def keyboard_detect()
+
 async def file_task():
     while True:
         if os.path.exists('command.txt'):
@@ -39,8 +66,8 @@ async def file_task():
                 command_text = command.read()
                 print(command_text)
             os.remove('command.txt')
-            channel = bot.get_channel(544008926132305930)
+            channel = bot.get_channel(521540280629854218)
             await channel.send(command_text)
 
 
-bot.run('NDgxOTk4NjMwMDk0NjM1MDI4.D0DrlQ.D1qUhdjtOpFEFQv_e3IliclA0NQ')
+bot.run()
